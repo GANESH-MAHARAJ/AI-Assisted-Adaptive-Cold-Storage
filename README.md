@@ -155,9 +155,6 @@ plotlyy/Scripts/activate       # activate plotly environment
 cd ..
 python plotly_app.py
 
-
-Use the link printed in terminal to open the dashboard.
-
 ## **4️⃣ Start Backend API (Terminal 2)**
 
 cd backend
@@ -167,8 +164,10 @@ python -m backend.app
 
 
 IMPORTANT:
+Use the link printed in terminal to open the dashboard.
 Always open the portal exactly from the URL printed in Terminal 2,
 because the backend dynamically generates the serving port.
+
 
 ## **5️⃣ Start Frontend Dashboard**
 
