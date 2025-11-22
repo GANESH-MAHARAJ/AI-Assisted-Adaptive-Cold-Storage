@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Adaptive Cold Storage — Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg:#0f1115; --panel:#171a21; --muted:#9fb1cc; --ink:#e8e8e8;
+      --chip:#243041; --chip2:#2f3e55; --accent1:#a216d7; --accent2:#00ffff;
+      --ok:#31c48d; --warn:#f59e0b; --err:#ef4444;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin:0; padding:24px; font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      color:var(--ink); background: radial-gradient(1200px 1200px at -10% -10%, rgba(162,22,215,.18), transparent 60%),
+                         radial-gradient(1200px 1200px at 110% 120%, rgba(0,255,255,.16), transparent 60%),
+                         var(--bg);
+    }
+    .header { display:flex; gap:12px; align-items:center; justify-content:space-between; margin-bottom:16px; }
+    .title { font-size:22px; font-weight:700; letter-spacing:.2px; }
+    .meta { color:var(--muted); font-size:12px; }
+    .board { display:grid; grid-template-columns: 1fr minmax(260px, 320px) 1fr; gap:16px; align-items:start; }
+    .card {
+      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.00)) , var(--panel);
+      border:1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.02);
+      border-radius:16px; padding:16px; min-width:320px;
+    }
+    .trayTitle { margin:0 0 10px; font-size:18px; font-weight:700; }
+    .grid { display:grid; grid-template-columns: repeat(2, minmax(120px, 1fr)); gap:10px; }
+    .kv { background:#0f1217; border:1px solid rgba(255,255,255,.06); border-radius:10px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; }
+    .kv span { color:var(--muted); font-size:12px; }
+    .kv strong { font-variant-numeric: tabular-nums; letter-spacing:.2px; }
+
+    /* Center column: toggle + agent or manual panel */
+    .center { display:flex; flex-direction:column; gap:12px; align-items:center; }
+    .toggleBox {
+      width:100%; background:var(--panel); border:1px solid rgba(255,255,255,.06); border-radius:16px; padding:12px; display:flex; flex-direction:column; gap:12px; align-items:center;
+      box-shadow: 0 8px 28px rgba(0,0,0,.3);
+    }
+    .switch-container{ display:flex; justify-content:center; width:100%; }
+    .switch-toggle{
+      position:relative; width:220px; height:42px; background:#1a1f2c; border-radius:21px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:0 16px; color:#9fb1cc; user-select:none;
+      border:1px solid rgba(255,255,255,.06);
+    }
+    .switch-handle{
+      position:absolute; top:4px; left:4px; width:100px; height:34px; border-radius:17px;
+      background: linear-gradient(90deg,var(--accent1),var(--accent2));
+      transition:left .2s; z-index:0; box-shadow: 0 8px 18px rgba(0,0,0,.35);
+    }
+    .switch-toggle.is-manual .switch-handle{ left:116px; }
+    .switch-option{ position:relative; z-index:1; font-weight:700; letter-spacing:.3px; }
+    .hint { color:var(--muted); font-size:12px; text-align:center; }
+
+    .agentPanel, .manualPanel {
+      width:100%; background:#10141c; border:1px solid rgba(255,255,255,.06); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:10px;
+    }
+    .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .row label { color:var(--muted); font-size:12px; }
+    input[type="number"]{
+      width:100px; padding:8px; border-radius:8px; border:1px solid #2a3344; background:#0f1217; color:var(--ink); font-variant-numeric: tabular-nums;
+    }
+    button {
+      background:var(--chip); color:var(--ink); border:1px solid rgba(255,255,255,.06); padding:8px 12px; border-radius:8px; cursor:pointer;
+    }
+    button:hover { background:var(--chip2); }
+    .rationale { color:#b9c0cf; font-size:12px; white-space:pre-wrap; }
+    .statusbar {
+      display:flex; gap:12px; flex-wrap:wrap; justify-content:flex-end; align-items:center;
+    }
+    .chip { padding:4px 8px; border-radius:999px; background:#0f1217; border:1px solid rgba(255,255,255,.06); font-size:12px; color:var(--muted); }
+    .chip.ok { color:#0ed290; border-color:rgba(14,210,144,.35); }
+    .chip.warn { color:#f5b454; border-color:rgba(245,180,84,.35); }
+    .chip.err { color:#ff7070; border-color:rgba(255,112,112,.35); }
+
+    details.debug { width:100%; background:#0b0e13; border:1px dashed rgba(255,255,255,.12); border-radius:12px; padding:8px 12px; }
+    details.debug summary { cursor:pointer; color:var(--muted); }
+    pre.log { margin:6px 0 0; padding:8px; background:#0f1217; border-radius:8px; overflow:auto; max-height:240px; font-size:12px; }
+
+    @media (max-width: 980px){
+      .board { grid-template-columns: 1fr; }
+      .center { order:-1; }
+    }
+    .footer-links {
+  margin-top: 32px;
+  padding: 16px;
+  text-align: center;
+  background: #0f1217;
+  border-top: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  box-shadow: 0 -4px 12px rgba(0,0,0,.25);
+}
+
+.footer-links a {
+  display: inline-block;
+  margin: 8px 12px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  color: #e8e8e8;
+  background: #1a1f2c;
+  border: 1px solid rgba(255,255,255,.1);
+  transition: all 0.2s ease;
+}
+
+.footer-links a:hover {
+  background: linear-gradient(90deg, #a216d7, #00ffff);
+  color: #0f1115;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.35);
+}
+
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">Adaptive Cold Storage — Admin</div>
+    <div class="statusbar">
+      <span class="meta" id="lastTs">Last cycle: —</span>
+      <span class="chip" id="modeChip">Mode: agent</span>
+      <span class="chip" id="cycleChip">Cycles: 0</span>
+    </div>
+  </div>
+
+  <div class="board">
+    <!-- Left tray -->
+    <div class="card">
+      <h3 class="trayTitle">Tray 1</h3>
+      <div class="grid">
+        <div class="kv"><span>Temp (°C)</span><strong id="t1">—</strong></div>
+        <div class="kv"><span>Humidity (%)</span><strong id="h1">—</strong></div>
+        <div class="kv"><span>CO₂ (ppm)</span><strong id="c1">—</strong></div>
+        <div class="kv"><span>Ethylene (ppm)</span><strong id="e1">—</strong></div>
+        <div class="kv"><span>Weight (g)</span><strong id="w1">—</strong></div>
+      </div>
+    </div>
+
+    <!-- Center column -->
+    <div class="center">
+      <div class="toggleBox">
+        <div class="switch-container">
+          <div class="switch-toggle" id="modeSwitch">
+            <div class="switch-handle"></div>
+            <span class="switch-option">Agent</span>
+            <span class="switch-option">Manual</span>
+          </div>
+        </div>
+        <div class="hint" id="modeHint">Agent decides → Apply to Arduino → Log → Update UI</div>
+
+        <!-- Agent panel -->
+        <div class="agentPanel" id="agentPanel">
+          <div class="row"><label>AC Valve</label><strong id="acv">—</strong></div>
+          <div class="row"><label>Humidifier Valve</label><strong id="hv">—</strong></div>
+          <div class="row"><label>Tray1 Fan</label><strong id="f1">—</strong></div>
+          <div class="row"><label>Tray2 Fan</label><strong id="f2">—</strong></div>
+          <div class="rationale" id="rationale">—</div>
+        </div>
+
+        <!-- Manual panel -->
+        <div class="manualPanel" id="manualPanel" style="display:none;">
+          <div class="row">
+            <label>AC Valve <input type="number" id="mac" min="0" max="1" value="0"></label>
+            <label>Humid Valve <input type="number" id="mhu" min="0" max="1" value="0"></label>
+          </div>
+          <div class="row">
+            <label>T1 Fan <input type="number" id="mf1" min="0" max="255" value="0"></label>
+            <label>T2 Fan <input type="number" id="mf2" min="0" max="255" value="0"></label>
+          </div>
+          <div class="row">
+            <button id="applyBtn">Apply</button>
+          </div>
+          <div class="hint">Manual apply writes to Arduino, logs to Mongo, and updates this panel.</div>
+        </div>
+
+        <!-- Debug -->
+        <details class="debug">
+          <summary>Debug output (agent prompt, raw response, applied command)</summary>
+          <pre class="log" id="dbg_in">[AGENT-IN] —</pre>
+          <pre class="log" id="dbg_raw">[AGENT-RAW-OUT] —</pre>
+          <pre class="log" id="dbg_applied">[APPLIED] —</pre>
+        </details>
+      </div>
+    </div>
+
+    <!-- Right tray -->
+    <div class="card">
+      <h3 class="trayTitle">Tray 2</h3>
+      <div class="grid">
+        <div class="kv"><span>Temp (°C)</span><strong id="t2">—</strong></div>
+        <div class="kv"><span>Humidity (%)</span><strong id="h2">—</strong></div>
+        <div class="kv"><span>CO₂ (ppm)</span><strong id="c2">—</strong></div>
+        <div class="kv"><span>Ethylene (ppm)</span><strong id="e2">—</strong></div>
+        <div class="kv"><span>Weight (g)</span><strong id="w2">—</strong></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-links">
+  <a href="http://127.0.0.1:8050" target="_blank">Open Plotly Plots -></a>
+  
+  </div>
+
+
+  <script>
+    const API_BASE = location.origin;
+    let currentMode = "agent";
+
+    function write(id, val){ const el = document.getElementById(id); if (el) el.textContent = val; }
+    function writePre(id, val){ const el = document.getElementById(id); if (el) el.textContent = val; }
+
+    function setModeUI(mode){
+      currentMode = mode;
+      const sw = document.getElementById("modeSwitch");
+      sw.classList.toggle("is-manual", mode === "manual");
+      document.getElementById("modeHint").textContent =
+        (mode === "agent") ? "Agent decides → Apply to Arduino → Log → Update UI"
+                           : "Agent loop paused. You control actuators below.";
+      document.getElementById("agentPanel").style.display  = (mode === "agent") ? "block" : "none";
+      document.getElementById("manualPanel").style.display = (mode === "manual") ? "block" : "none";
+      const modeChip = document.getElementById("modeChip");
+      if (modeChip) modeChip.textContent = "Mode: " + mode;
+    }
+
+    async function setMode(mode){
+      try{
+        const r = await fetch(`${API_BASE}/mode`, {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({ mode })
+        });
+        const j = await r.json();
+        if (j.ok) setModeUI(j.mode);
+      }catch(e){ console.error(e); }
+    }
+
+    async function manualApply(){
+      const cmd = {
+        rackACvalve: Number(document.getElementById("mac").value),
+        rackHumidifiervalve: Number(document.getElementById("mhu").value),
+        tray1fanspeed: Number(document.getElementById("mf1").value),
+        tray2fanspeed: Number(document.getElementById("mf2").value),
+      };
+      try{
+        const r = await fetch(`${API_BASE}/manual/apply`, {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({ actuators: cmd })
+        });
+        const j = await r.json();
+        // State will refresh on next poll
+      }catch(e){ console.error(e); }
+    }
+
+    // Poll only /state; backend publishes after apply+log
+    async function pollState(){
+      try{
+        const r = await fetch(`${API_BASE}/state`);
+        if (!r.ok) return;
+        const s = await r.json();
+
+        // meta
+        if (s.ts) document.getElementById("lastTs").textContent = "Last cycle: " + s.ts;
+        if (typeof s.cycles === "number") document.getElementById("cycleChip").textContent = "Cycles: " + s.cycles;
+        if (s.mode) setModeUI(s.mode);
+
+        // trays
+        if (s.snapshot){
+          const t1 = s.snapshot.tray1, t2 = s.snapshot.tray2;
+          if (t1){ write("t1", t1.temp?.toFixed?.(2) ?? "—");
+                   write("h1", t1.humidity?.toFixed?.(2) ?? "—");
+                   write("c1", t1.co2ppm?.toFixed?.(0) ?? "—");
+                   write("e1", t1.ethyleneppm?.toFixed?.(1) ?? "—");
+                   write("w1", t1.weight?.toFixed?.(2) ?? "—"); }
+          if (t2){ write("t2", t2.temp?.toFixed?.(2) ?? "—");
+                   write("h2", t2.humidity?.toFixed?.(2) ?? "—");
+                   write("c2", t2.co2ppm?.toFixed?.(0) ?? "—");
+                   write("e2", t2.ethyleneppm?.toFixed?.(1) ?? "—");
+                   write("w2", t2.weight?.toFixed?.(2) ?? "—"); }
+        }
+
+        // actuators + rationale
+        if (s.decision && s.decision.actuators){
+          const a = s.decision.actuators;
+          write("acv", String(a.rackACvalve ?? "—"));
+          write("hv",  String(a.rackHumidifiervalve ?? "—"));
+          write("f1",  String(a.tray1fanspeed ?? "—"));
+          write("f2",  String(a.tray2fanspeed ?? "—"));
+          document.getElementById("rationale").textContent = s.decision.rationale || "—";
+        }
+
+        // debug: prompt to agent, raw agent text, applied command
+        if (s.debug){
+          // We log agent input and applied in backend auto loop; carry them in debug if you want.
+          // Here we surface what backend included:
+          if (s.debug.agent_in_json){
+            writePre("dbg_in", "[AGENT-IN] " + s.debug.agent_in_json);
+          }
+          if (s.debug.raw){
+            writePre("dbg_raw", "[AGENT-RAW-OUT] " + s.debug.raw);
+          }
+        }
+        if (s.decision && s.decision.actuators){
+          writePre("dbg_applied", "[APPLIED] " + JSON.stringify(s.decision.actuators));
+        }
+      }catch(e){ console.error(e); }
+    }
+
+    // Wire UI
+    document.addEventListener("DOMContentLoaded", () => {
+      const sw = document.getElementById("modeSwitch");
+      sw.addEventListener("click", () => setMode(currentMode === "agent" ? "manual" : "agent"));
+      document.getElementById("applyBtn").addEventListener("click", manualApply);
+      setInterval(pollState, 2000);
+      pollState();
+    });
+  </script>
+</body>
+</html>
