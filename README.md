@@ -61,13 +61,14 @@ Both modes are unified in a predictable control loop.
 
 # 🔥 System Architecture (Block Diagrams & Workflow)
 
-### **Overall System Architecture**
-![System Architecture](/assets/SystemArch.png)
+### **High-Level Block Diagram**
+![Block Diagram](/assets/BlockDiagram.png)
 
 ---
 
-### **High-Level Block Diagram**
-![Block Diagram](/assets/BlockDiagram.png)
+### **Overall System Architecture**
+![System Architecture](/assets/SystemArch.png)
+
 
 ---
 
