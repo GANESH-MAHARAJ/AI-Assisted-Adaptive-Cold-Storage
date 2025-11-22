@@ -62,7 +62,7 @@ Both modes are unified in a predictable control loop.
 # 🔥 System Architecture (Block Diagrams & Workflow)
 
 ### **High-Level Block Diagram**
-![Block Diagram](/assets/BlockDiagram.png)
+<img src="assets/BlockDiagram.png" width="600">
 
 ---
 
@@ -72,7 +72,7 @@ Both modes are unified in a predictable control loop.
 ---
 
 ### **Data Flow Diagram**
-![Data Flow](/assets/DataFlowDiagram.png)
+<img src="assets/DataFlowDiagram.png" width="600">
 
 ---
 
@@ -82,7 +82,7 @@ Both modes are unified in a predictable control loop.
 ### **Temperature & Humidity Stabilization**
 The multi-zone adaptive loop stabilizes trays at different setpoints depending on commodity requirements.
 
-![Temperature/Humidity Stability](/assets/temp_hum_stabli.png)
+<img src="assets/temp_hum_stabli.png" width="600">
 
 This demonstrates how **Tray 1** and **Tray 2** converge to different environmental profiles over a 20-minute cycle.
 
@@ -91,7 +91,7 @@ This demonstrates how **Tray 1** and **Tray 2** converge to different environmen
 # 🧱 Hardware Architecture
 
 ### **Sensor Layout (per tray)**
-![3D Tray Model](/assets/3d_tray_img.png)
+<img src="assets/3d_tray_img.png" width="600">
 
 Includes:
 
@@ -101,11 +101,6 @@ Includes:
 - Load cell + HX711 (weight tracking)  
 - Airflow fan & recirculation blower  
 - AC/Humidity inlet  
-
----
-
-### **Full Circuit Diagram**
-![Circuit](/assets/circuitDiag.png)
 
 ---
 
