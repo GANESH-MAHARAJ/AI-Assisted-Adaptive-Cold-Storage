@@ -67,7 +67,7 @@ Both modes are unified in a predictable control loop.
 ---
 
 ### **Overall System Architecture**
-<img src="assets/SystemArch.png" width="600">
+<img src="assets/SystemArch.png" width="500" height="1000">
 
 ---
 
