@@ -141,12 +141,14 @@ These steps assume a **Windows** environment.
 ---
 
 ## **1️⃣ Start MongoDB**
+
 mongod
 
-2️⃣ Pull Llama 3.1 into Ollama
+## **2️⃣ Pull Llama 3.1 into Ollama**
+
 ollama pull llama3.1
 
-3️⃣ Start Plotly Dashboard (Terminal 1)
+## **3️⃣ Start Plotly Dashboard (Terminal 1)**
 
 cd backend
 plotlyy/Scripts/activate       # activate plotly environment
@@ -156,7 +158,7 @@ python plotly_app.py
 
 Use the link printed in terminal to open the dashboard.
 
-4️⃣ Start Backend API (Terminal 2)
+## **4️⃣ Start Backend API (Terminal 2)**
 
 cd backend
 .venv/Scripts/activate         # main backend environment
@@ -168,7 +170,7 @@ IMPORTANT:
 Always open the portal exactly from the URL printed in Terminal 2,
 because the backend dynamically generates the serving port.
 
-5️⃣ Start Frontend Dashboard
+## **5️⃣ Start Frontend Dashboard**
 
 Open manually:
 
@@ -176,25 +178,19 @@ dashboard/index.html → Right click → Open with Live Server / Browser
 
 🧠 Working Modes
 
-- Manual Mode
+Manual Mode
 
-Operator sends actuator commands from dashboard UI
+- Operator sends actuator commands from dashboard UI
+- API forwards commands directly to controller
+- Arduino executes commands via PWM/relays
 
-API forwards commands directly to controller
+AI Mode
 
-Arduino executes commands via PWM/relays
-
-- AI Mode
-
-Dashboard requests "decision JSON" from agent
-
-Llama 3.1 generates tray-wise instruction JSON
-
-API validates & forwards commands
-
-Controller applies actuator state
-
-Changes logged into MongoDB
+- Dashboard requests "decision JSON" from agent
+- Llama 3.1 generates tray-wise instruction JSON
+- API validates & forwards commands
+- Controller applies actuator state
+- Changes logged into MongoDB
 
 
 🧑‍💻 Author
