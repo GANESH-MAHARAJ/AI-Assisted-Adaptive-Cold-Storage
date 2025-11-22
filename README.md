@@ -62,31 +62,27 @@ Both modes are unified in a predictable control loop.
 # 🔥 System Architecture (Block Diagrams & Workflow)
 
 ### **Overall System Architecture**
-![System Architecture](/mnt/data/SystemArch.png)
+![System Architecture](/assests/SystemArch.png)
 
 ---
 
 ### **High-Level Block Diagram**
-![Block Diagram](/mnt/data/BlockDiagram.png)
+![Block Diagram](/assests/BlockDiagram.png)
 
 ---
 
 ### **Data Flow Diagram**
-![Data Flow](/mnt/data/0595b5a6-39ef-4273-811b-648c9c9ede5a.png)
+![Data Flow](/assests/DataFlowDiagram.png)
 
 ---
 
-### **Sequence Diagram (Dashboard → API → Agent → Actuators)**
-![Sequence Diagram](/mnt/data/Seq_diag.png)
-
----
 
 # 🧪 Experimental Validation
 
 ### **Temperature & Humidity Stabilization**
 The multi-zone adaptive loop stabilizes trays at different setpoints depending on commodity requirements.
 
-![Temperature/Humidity Stability](/mnt/data/temp_hum_stabli.png)
+![Temperature/Humidity Stability](/assests/temp_hum_stabli.png)
 
 This demonstrates how **Tray 1** and **Tray 2** converge to different environmental profiles over a 20-minute cycle.
 
@@ -95,7 +91,7 @@ This demonstrates how **Tray 1** and **Tray 2** converge to different environmen
 # 🧱 Hardware Architecture
 
 ### **Sensor Layout (per tray)**
-![3D Tray Model](/mnt/data/3d_tray_img.png)
+![3D Tray Model](/assests/3d_tray_img.png)
 
 Includes:
 
@@ -109,7 +105,7 @@ Includes:
 ---
 
 ### **Full Circuit Diagram**
-![Circuit](/mnt/data/circuitDiag.png)
+![Circuit](/assests/circuitDiag.png)
 
 ---
 
